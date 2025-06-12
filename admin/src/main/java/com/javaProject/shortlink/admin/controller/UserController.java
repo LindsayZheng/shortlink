@@ -1,6 +1,7 @@
 package com.javaProject.shortlink.admin.controller;
 
 import com.javaProject.shortlink.admin.common.convention.result.Result;
+import com.javaProject.shortlink.admin.common.convention.result.Results;
 import com.javaProject.shortlink.admin.common.enums.UserErrorCodeEnum;
 import com.javaProject.shortlink.admin.dto.resp.UserRespDTO;
 import com.javaProject.shortlink.admin.service.UserService;
@@ -24,7 +25,7 @@ public class UserController {
         if (result == null) {
             return new Result<UserRespDTO>().setCode(UserErrorCodeEnum.USER_NULL.code()).setMessage(UserErrorCodeEnum.USER_NULL.message());
         } else {
-            return new Result<UserRespDTO>().setCode("0").setData(result);
+            return Results.success(result);
         }
     }
 }
