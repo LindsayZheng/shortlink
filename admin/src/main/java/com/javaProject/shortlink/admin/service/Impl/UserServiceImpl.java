@@ -9,6 +9,8 @@ import com.javaProject.shortlink.admin.dao.entity.UserDO;
 import com.javaProject.shortlink.admin.dao.mapper.UserMapper;
 import com.javaProject.shortlink.admin.dto.resp.UserRespDTO;
 import com.javaProject.shortlink.admin.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.redisson.api.RBloomFilter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,11 @@ import org.springframework.stereotype.Service;
  * 用户接口实现层
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
+
+    private RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
+
     @Override
     public UserRespDTO getUserByUsername(String username) {
         LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
@@ -32,8 +38,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public Boolean hasUserName(String username){
-        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class).eq(UserDO::getUsername, username);
-        UserDO userDO = baseMapper.selectOne(queryWrapper);
-        return userDO != null;
+        return userRegisterCachePenetrationBloomFilter.contains(username);
     }
 }
