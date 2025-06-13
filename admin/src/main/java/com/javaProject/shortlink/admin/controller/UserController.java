@@ -40,9 +40,18 @@ public class UserController {
     /**
      * 注册用户
      */
-    @PostMapping("/api/shortlink/v1/user")
+    @PostMapping("/api/shortlink/v1/user/register")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
         userService.register(requestParam);
+        return Results.success();
+    }
+
+    /**
+     * 修改用户
+     */
+    @PostMapping("/api/shortlink/v1/user/update")
+    public Result<Void> update(@RequestBody UserRegisterReqDTO requestParam) {
+        userService.update(requestParam);
         return Results.success();
     }
 }
