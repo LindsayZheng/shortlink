@@ -8,7 +8,8 @@ public enum UserErrorCodeEnum implements IErrorCode {
     USER_NAME_EXIST("B000201", "用户名已存在"),
     USER_EXIST("B000202", "用户已存在"),
     USER_SAVE_ERROR("B000204", "用户记录新增失败"),
-    USER_HAS_LOGGED_IN("B000205", "用户已登录");
+    USER_HAS_LOGGED_IN("B000205", "用户已登录"),
+    USER_LOG_OUT_ERROR("B00206", "用户未登录或者 token 不存在");
     private final String code;
 
     private final String message;
