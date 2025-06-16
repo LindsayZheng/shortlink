@@ -20,6 +20,7 @@ public class UserConfiguration {
         FilterRegistrationBean<UserTransmitFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new UserTransmitFilter(stringRedisTemplate));
         registration.addUrlPatterns("/*");
+        registration.addInitParameter("login", "/api/shortlink/v1/user/login");
         registration.setOrder(0);
         return registration;
     }
