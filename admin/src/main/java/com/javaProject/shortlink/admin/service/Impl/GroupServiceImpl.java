@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.javaProject.shortlink.admin.common.biz.user.UserContext;
 import com.javaProject.shortlink.admin.dao.entity.GroupDO;
 import com.javaProject.shortlink.admin.dao.mapper.GroupMapper;
 import com.javaProject.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
@@ -30,6 +31,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
                 .sortOrder(0)
+                .username(UserContext.getUsername())
                 .name(groupName)
                 .build();
         baseMapper.insert(groupDO);
