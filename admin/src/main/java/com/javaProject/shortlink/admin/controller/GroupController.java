@@ -2,6 +2,7 @@ package com.javaProject.shortlink.admin.controller;
 
 import com.javaProject.shortlink.admin.common.convention.result.Result;
 import com.javaProject.shortlink.admin.common.convention.result.Results;
+import com.javaProject.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import com.javaProject.shortlink.admin.dto.req.ShortlinkGroupSaveReqDTO;
 import com.javaProject.shortlink.admin.dto.req.ShortlinkGroupUpdateReqDTO;
 import com.javaProject.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
@@ -48,6 +49,15 @@ public class GroupController {
     @DeleteMapping("/api/shortlink/v1/group")
     public Result<Void>  deleteGroup(@RequestParam String gid) {
         groupService.deleteGroup(gid);
+        return Results.success();
+    }
+
+    /**
+     * 排序短链接
+     */
+    @PostMapping("/api/shortlink/v1/group/sort")
+    public Result<Void>  sortGroup(@RequestBody List<ShortLinkGroupSortReqDTO> requestParam) {
+        groupService.sortGroup(requestParam);
         return Results.success();
     }
 }
