@@ -1,6 +1,7 @@
 package com.javaProject.shortlink.project.dto.resp;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -22,6 +23,10 @@ public class ShortLinkPageRespDTO {
 
     private Integer validDateType;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date validDate;
 
     @TableField("`describe`")
