@@ -12,6 +12,7 @@ import com.javaProject.shortlink.project.dao.mapper.ShortLinkMapper;
 import com.javaProject.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.javaProject.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.javaProject.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.javaProject.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.javaProject.shortlink.project.service.ShortLinkService;
 import com.javaProject.shortlink.project.toolkit.HashUtil;
 import lombok.RequiredArgsConstructor;
@@ -73,14 +74,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     @Override
-    public IPage<ShortLinkCreateRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam) {
+    public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam) {
         LambdaQueryWrapper<ShortLinkDO> lambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
                 .eq(ShortLinkDO::getGid, requestParam.getGid())
                 .eq(ShortLinkDO::getEnableStatus, 0)
                 .eq(ShortLinkDO::getDelFlag, 0)
                 .orderByDesc(ShortLinkDO::getCreateTime);
         IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestParam, lambdaQueryWrapper);
-        return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkCreateRespDTO.class));
+        return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {

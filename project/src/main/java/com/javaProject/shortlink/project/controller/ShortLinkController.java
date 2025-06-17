@@ -6,6 +6,7 @@ import com.javaProject.shortlink.project.common.convention.result.Results;
 import com.javaProject.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.javaProject.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.javaProject.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.javaProject.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.javaProject.shortlink.project.service.ShortLinkService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,7 +40,7 @@ public class ShortLinkController {
      */
     @ApiOperation("分页查询短链接")
     @GetMapping("/api/shortlink/v1/page")
-    public Result<IPage<ShortLinkCreateRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
+    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         return Results.success(shortLinkService.pageShortLink(requestParam));
     }
 }

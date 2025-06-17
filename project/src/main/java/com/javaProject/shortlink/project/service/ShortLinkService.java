@@ -6,6 +6,7 @@ import com.javaProject.shortlink.project.dao.entity.ShortLinkDO;
 import com.javaProject.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.javaProject.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.javaProject.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.javaProject.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 
 /**
  * 短链接接口层
@@ -23,5 +24,5 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param requestParam 短链接分页查询请求参数
      * @return 短链接分页返回结果
      */
-    IPage<ShortLinkCreateRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam);
+    IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam);
 }
