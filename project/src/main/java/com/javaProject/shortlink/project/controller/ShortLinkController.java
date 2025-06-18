@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 用户链接控制层
+ * 后管：用户链接控制层
  */
 @Api(tags = "短链接管理")
 @RestController
