@@ -36,11 +36,16 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService(){};
 
     @Override
-    public void saveGroup(String groupName) {
+    public void saveGroup(String groupName){
+        saveGroup(UserContext.getUsername(), groupName);
+    }
+    // 在创建用户时，提供 username 参数
+    @Override
+    public void saveGroup(String username, String groupName) {
         String gid;
         while(true){
             gid = RandomGenerator.generate();
-            if (!hasGid(gid)) break;
+            if (!hasGid(username, gid)) break;
         }
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
@@ -51,19 +56,28 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         baseMapper.insert(groupDO);
     }
 
+
+
     @Override
     public List<ShortLinkGroupRespDTO> listGroup() {
         // TODO 获取用户名
-        String username = UserContext.getUsername();
+        // String username = UserContext.getUsername();
+
+        // 找到通过 username 找到当前用户创建的短视频分组集合，也就是该用户对应的 gid
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getDelFlag, 0)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
+        // 通过 gid 找到当前用户的所有短链接
         Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkRemoteService
                 .listGroupCountShortlink(groupDOList.stream().map(GroupDO::getGid).toList());
+        // 将用户创建的分组集合转换成 shortLinkGroupRespDTO 类型的 list
         List<ShortLinkGroupRespDTO> shortLinkGroupRespDTOList = BeanUtil.copyToList(groupDOList, ShortLinkGroupRespDTO.class);
+        // 将每个分组的短链接数量（shortLinkCount）设置到对应的 ShortLinkGroupRespDTO 中
+        // 1. forEach 遍历当前用户的所有分组 -> shortLinkGroupRespDTOList
         shortLinkGroupRespDTOList.forEach(each -> {
+            // 2. getData() 返回分组短链接数量统计列表；stream() 转流
             Optional<ShortLinkGroupCountQueryRespDTO> first = listResult.getData().stream()
                     .filter(item -> Objects.equals(each.getGid(), item.getGid())).findFirst();
             first.ifPresent(item -> each.setShortLinkCount(first.get().getShortLinkCount()));
@@ -111,11 +125,13 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         });
     }
 
-    private boolean  hasGid(String gid)  {
+    // 新增 username 参数
+    private boolean  hasGid(String username, String gid)  {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
                 //todo 设置用户名
-                .eq(GroupDO::getUsername, UserContext.getUsername());
+                // 进行判断，防止空值
+                .eq(GroupDO::getUsername, Optional.ofNullable(username).orElse(UserContext.getUsername()));
         GroupDO hasGroupFlag = baseMapper.selectOne(queryWrapper);
         return hasGroupFlag != null;
     }
