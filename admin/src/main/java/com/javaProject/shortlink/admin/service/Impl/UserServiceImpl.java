@@ -17,6 +17,7 @@ import com.javaProject.shortlink.admin.dto.resp.UserLoginRespDTO;
 import com.javaProject.shortlink.admin.dto.resp.UserRespDTO;
 import com.javaProject.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.shardingsphere.sharding.exception.metadata.DuplicatedIndexException;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -67,9 +68,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         RLock lock = redissonClient.getLock(LOCK_USER_REGISTER_KEY + requestParam.getUsername());
         try {
             if  (lock.tryLock()) {
-                int inserted = baseMapper.insert(BeanUtil.toBean(requestParam, UserDO.class));
-                if (inserted < 1) {
-                    throw new ClientException(USER_SAVE_ERROR);
+                try {
+                    int inserted = baseMapper.insert(BeanUtil.toBean(requestParam, UserDO.class));
+                    if (inserted < 1) {
+                        throw new ClientException(USER_SAVE_ERROR);
+                    }
+                }
+                catch (DuplicatedIndexException e){
+                    throw new ClientException(USER_EXIST);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
                 return;

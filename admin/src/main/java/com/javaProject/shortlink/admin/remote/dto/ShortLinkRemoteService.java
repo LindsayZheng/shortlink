@@ -8,9 +8,11 @@ import com.javaProject.shortlink.admin.common.convention.result.Result;
 import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import com.javaProject.shortlink.project.dto.req.ShortLinkCreateReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,4 +45,17 @@ public interface ShortLinkRemoteService {
         // 使用 fastJSON 进行序列化
         return JSON.parseObject(resultPageStr, new TypeReference<>() {});
     }
+
+    /**
+     * 查询短链接数量
+     * @param requestParam 查询短链接数量请求参数
+     * @return 短链接数量查询响应
+     */
+    default Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupCountShortlink(List<String> requestParam) {
+        Map<String, Object> requsetMap = new HashMap<>();
+        requsetMap.put("requestParam", requestParam);
+        String resultGroupCountStr = HttpUtil.get("http://127.0.0.1:8001/api/shortlink/v1/count", requsetMap);
+        return JSON.parseObject(resultGroupCountStr, new TypeReference<>() {});
+    }
+
 }

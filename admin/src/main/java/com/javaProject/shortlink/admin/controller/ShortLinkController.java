@@ -6,7 +6,7 @@ import com.javaProject.shortlink.admin.remote.dto.ShortLinkRemoteService;
 import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import com.javaProject.shortlink.project.dto.req.ShortLinkCreateReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;

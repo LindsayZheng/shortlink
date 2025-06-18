@@ -1,5 +1,6 @@
 package com.javaProject.shortlink.admin.controller;
 
+import com.javaProject.shortlink.admin.common.biz.user.UserContext;
 import com.javaProject.shortlink.admin.common.convention.result.Result;
 import com.javaProject.shortlink.admin.common.convention.result.Results;
 import com.javaProject.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
@@ -20,8 +21,12 @@ import java.util.List;
 public class GroupController {
     private final GroupService groupService;
 
+    /**
+     * 新增短链接分组
+     */
     @PostMapping("/api/shortlink/admin/v1/group")
-    public Result<Void> save(@RequestBody ShortlinkGroupSaveReqDTO requestParam) {
+    public Result<Void> saveGroup(@RequestBody ShortlinkGroupSaveReqDTO requestParam) {
+        String username = UserContext.getUsername();
         groupService.saveGroup(requestParam.getName());
         return Results.success();
     }
@@ -31,6 +36,7 @@ public class GroupController {
      */
     @GetMapping("/api/shortlink/admin/v1/group")
     public Result<List<ShortLinkGroupRespDTO>> listGroup() {
+        String username = UserContext.getUsername();
         return Results.success(groupService.listGroup());
     }
 
@@ -60,4 +66,6 @@ public class GroupController {
         groupService.sortGroup(requestParam);
         return Results.success();
     }
+
+
 }
