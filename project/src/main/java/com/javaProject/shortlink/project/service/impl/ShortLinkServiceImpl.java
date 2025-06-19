@@ -24,6 +24,7 @@ import com.javaProject.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDT
 import com.javaProject.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.javaProject.shortlink.project.service.ShortLinkService;
 import com.javaProject.shortlink.project.toolkit.HashUtil;
+import com.javaProject.shortlink.project.toolkit.LinkUtil;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -95,6 +96,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         catch (DuplicateKeyException e) {
             throw new ServiceException(String.format("短链接: %s 生成重复", fullShortUrl));
         }
+
+        // 缓存预热
+        // 若该短链接有效期为永久，则初始化为一个月
+        // 若短链接有效期非永久，则设置成有效期结束
+        stringRedisTemplate.opsForValue().set(
+                fullShortUrl,
+                requestParam.getOriginUrl(),
+                LinkUtil.getLinkCacheValidTime(requestParam.getValidDate()), TimeUnit.MILLISECONDS
+        );
+
         // 布隆过滤器添加生成的短链接
         rBloomFilter.add(fullShortUrl);
 
