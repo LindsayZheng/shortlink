@@ -5,11 +5,12 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.javaProject.shortlink.admin.common.convention.result.Result;
-import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
-import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
-import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,4 +59,11 @@ public interface ShortLinkRemoteService {
         return JSON.parseObject(resultGroupCountStr, new TypeReference<>() {});
     }
 
+    /**
+     * 修改短链接
+     * @param requestParam 修改短链接请求参数
+     */
+    default void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/shortlink/v1/update", JSON.toJSONString(requestParam));
+    }
 }

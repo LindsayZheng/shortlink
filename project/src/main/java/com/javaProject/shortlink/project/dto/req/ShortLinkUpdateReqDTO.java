@@ -6,15 +6,20 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class ShortLinkCreateReqDTO {
+public class ShortLinkUpdateReqDTO {
+    private String fullShortUrl;
 
-    private String domain;
+    private String originalUrl;
 
-    private String originUrl;
+    /**
+     * 原始 gid
+     */
+    private String originGid;
 
+    /**
+     * 修改后的 gid
+     */
     private String gid;
-
-    private Integer createdType;
 
     private Integer validDateType;
 
@@ -22,4 +27,5 @@ public class ShortLinkCreateReqDTO {
     private Date validDate;
 
     private String describe;
+
 }

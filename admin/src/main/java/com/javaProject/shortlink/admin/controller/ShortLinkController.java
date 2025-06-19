@@ -7,12 +7,11 @@ import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
+import com.javaProject.shortlink.admin.common.convention.result.Results;
+import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 短链接后管控制层
@@ -42,5 +41,15 @@ public class ShortLinkController {
     @GetMapping("/api/shortlink/admin/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         return shortLinkRemoteService.pageShortLink(requestParam);
+    }
+
+    /**
+     * 修改短链接
+     */
+    @ApiOperation("修改短链接")
+    @PostMapping("/api/shortlink/admin/v1/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+        shortLinkRemoteService.updateShortLink(requestParam);
+        return Results.success();
     }
 }
