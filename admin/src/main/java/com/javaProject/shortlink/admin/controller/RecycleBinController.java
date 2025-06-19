@@ -1,10 +1,15 @@
 package com.javaProject.shortlink.admin.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.javaProject.shortlink.admin.common.convention.result.Result;
 import com.javaProject.shortlink.admin.common.convention.result.Results;
-import com.javaProject.shortlink.admin.remote.dto.ShortLinkRemoteService;
 import com.javaProject.shortlink.admin.dto.req.RecycleBinSaveReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import com.javaProject.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
+import com.javaProject.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import com.javaProject.shortlink.admin.service.RecycleBinService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RecycleBinController {
 
+    private final RecycleBinService recycleBinService;
+
     /**
      * 后续重构为 SpringCloud Feign 调用
      */
@@ -25,9 +32,17 @@ public class RecycleBinController {
     /**
      * 保存回收站
      */
-    @PostMapping("/api/shortlink/v1/recycle-bin/save")
+    @PostMapping("/api/shortlink/admin/v1/recycle-bin/save")
     public Result<Void> saveRecycleBin(@RequestBody RecycleBinSaveReqDTO requestParam) {
         shortLinkRemoteService.saveRecycleBin(requestParam);
         return Results.success();
+    }
+
+    /**
+     * 分页查询回收站短链接
+     */
+    @GetMapping("/api/shortlink/admin/v1/recycle-bin/page")
+    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
+        return recycleBinService.pageRecycleBinShortLink(requestParam);
     }
 }
