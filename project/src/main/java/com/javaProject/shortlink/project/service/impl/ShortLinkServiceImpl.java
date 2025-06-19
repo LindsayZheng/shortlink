@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.javaProject.shortlink.project.common.constant.RedisKeyConstant.GOTO_SHORT_LINK_KEY;
 import static com.javaProject.shortlink.project.common.constant.RedisKeyConstant.LOCK_GOTO_SHORT_LINK_KEY;
@@ -62,6 +63,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
 //    private final ShortLinkMapper shortLinkMapper;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
         String shortLinkSuffix = generateSuffix(requestParam);
@@ -91,14 +93,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             shortLinkGotoMapper.insert(linkGotoDO);
         }
         catch (DuplicateKeyException e) {
-            // 发生误判，查询数据库
-            LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                            .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
-            ShortLinkDO hasShortLinkDO = baseMapper.selectOne(queryWrapper);
-            if (hasShortLinkDO != null) {
-                log.warn("短链接 {} 重复入库", fullShortUrl);
-                throw new ServiceException("短链接生成重复");
-            }
+            throw new ServiceException(String.format("短链接: %s 生成重复", fullShortUrl));
         }
         // 布隆过滤器添加生成的短链接
         rBloomFilter.add(fullShortUrl);
@@ -260,15 +255,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {
-        String originUrl = requestParam.getOriginUrl();
-        String shortUri;
         // 发生哈希冲突时重试
         int customGenerateCount = 0;
+        String shortUri;
         while (true) {
             // 当前生成短链接尝试次数
             if (customGenerateCount > 10) {
                 throw new RuntimeException("短链接频繁生成，请稍后再试");
             }
+            String originUrl = requestParam.getOriginUrl();
+            originUrl += UUID.randomUUID().toString();
             // 生成短链接
             shortUri = HashUtil.hashToBase62(originUrl);
             // 查询该短链接是否存在，短链接不存在，跳出循环
@@ -277,6 +273,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             }
             customGenerateCount++;
         }
-        return HashUtil.hashToBase62(originUrl);
+        return shortUri;
     }
 }
