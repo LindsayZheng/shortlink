@@ -164,30 +164,31 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 ((HttpServletResponse) response).sendRedirect(SHORT_LINK_NOT_FOUND_PAGE);
                 return;
             }
-            // 检索 link 表，并确认该短链接是否有效
+            // 路由表中有对应短链接
+            // 检索 link 表
             LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
                     .eq(ShortLinkDO::getGid, shortLinkGotoDO.getGid())
                     .eq(ShortLinkDO::getFullShortUrl, fullShortUrl)
                     .eq(ShortLinkDO::getDelFlag, 0)
                     .eq(ShortLinkDO::getEnableStatus, 0);
             ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
-            // 执行重定向
-            if (shortLinkDO != null) {
-                // 将数据库中的数据加入到缓存中
-                // 判断当前有效期是否合法，即是否过期
-                if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date())) {
-                    stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
-                    // 页面不存在，重定向
-                    ((HttpServletResponse) response).sendRedirect(SHORT_LINK_NOT_FOUND_PAGE);
-                    return;
-                }
-                stringRedisTemplate.opsForValue().set(
-                        String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),
-                        shortLinkDO.getOriginUrl(),
-                        LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()), TimeUnit.MILLISECONDS
-                );
-                ((HttpServletResponse) response).sendRedirect(shortLinkDO.getOriginUrl());
+            // 确认短链接是否有效
+            // 1. 短链接查询结果不能为空
+            // 2. 短链接查询结果的有效期
+            // 2.1. 永久有效 2.2. 短链接已过期
+            if (shortLinkDO == null || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
+                stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                ((HttpServletResponse) response).sendRedirect("/page/notfound");
+                return;
             }
+            // 将短链接写入缓存
+            stringRedisTemplate.opsForValue().set(
+                    String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),
+                    shortLinkDO.getOriginUrl(),
+                    LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()), TimeUnit.MILLISECONDS
+            );
+            // 执行短链接重定向
+            ((HttpServletResponse) response).sendRedirect(shortLinkDO.getOriginUrl());
         } finally {
             lock.unlock();
         }
