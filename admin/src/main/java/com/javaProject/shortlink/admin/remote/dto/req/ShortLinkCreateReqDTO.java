@@ -22,4 +22,9 @@ public class ShortLinkCreateReqDTO {
     private Date validDate;
 
     private String describe;
+
+    /**
+     * 协议
+     */
+    private String domainProtocol;
 }
