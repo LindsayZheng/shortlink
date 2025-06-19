@@ -43,6 +43,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.javaProject.shortlink.project.common.constant.RedisKeyConstant.*;
+import static com.javaProject.shortlink.project.common.constant.ShortLinkNotFoundConstant.SHORT_LINK_NOT_FOUND_PAGE;
 
 /**
  * 短链接接口实现层
@@ -130,10 +131,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         boolean contains = rBloomFilter.contains(fullShortUrl);
         if (!contains) {
+            // 页面不存在，重定向
+            ((HttpServletResponse) response).sendRedirect(SHORT_LINK_NOT_FOUND_PAGE);
             return;
         }
         String gotoIsNullShortLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
+            // 页面不存在，重定向
+            ((HttpServletResponse) response).sendRedirect(SHORT_LINK_NOT_FOUND_PAGE);
             return;
         }
 
@@ -155,6 +160,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             if (shortLinkGotoDO == null) {
                 // 严谨来说此处需要进行封控
                 stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                // 页面不存在，重定向
+                ((HttpServletResponse) response).sendRedirect(SHORT_LINK_NOT_FOUND_PAGE);
                 return;
             }
             // 检索 link 表，并确认该短链接是否有效
@@ -169,8 +176,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 // 将数据库中的数据加入到缓存中
                 // 判断当前有效期是否合法，即是否过期
                 if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date())) {
-
                     stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                    // 页面不存在，重定向
+                    ((HttpServletResponse) response).sendRedirect(SHORT_LINK_NOT_FOUND_PAGE);
                     return;
                 }
                 stringRedisTemplate.opsForValue().set(
